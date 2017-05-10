@@ -253,6 +253,10 @@ function installModule (store, rootState, path, module, hot) {
   })
 
   module.forEachAction((action, key) => {
+    if(action.root){
+      return registerAction(store, key, action.handler, local);
+    }
+    
     const namespacedType = namespace + key
     registerAction(store, namespacedType, action, local)
   })

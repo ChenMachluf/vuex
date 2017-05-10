@@ -1,5 +1,5 @@
 /**
- * vuex v2.3.0
+ * vuex v2.3.1
  * (c) 2017 Evan You
  * @license MIT
  */
@@ -243,9 +243,13 @@ var Store = function Store (options) {
   assert(Vue, "must call Vue.use(Vuex) before creating a store instance.");
   assert(typeof Promise !== 'undefined', "vuex requires a Promise polyfill in this browser.");
 
-  var state = options.state; if ( state === void 0 ) state = {};
   var plugins = options.plugins; if ( plugins === void 0 ) plugins = [];
   var strict = options.strict; if ( strict === void 0 ) strict = false;
+
+  var state = options.state; if ( state === void 0 ) state = {};
+  if (typeof state === 'function') {
+    state = state();
+  }
 
   // store internal state
   this._committing = false;
@@ -489,6 +493,10 @@ function installModule (store, rootState, path, module, hot) {
   });
 
   module.forEachAction(function (action, key) {
+    if(action.root){
+      return registerAction(store, key, action.handler, local);
+    }
+    
     var namespacedType = namespace + key;
     registerAction(store, namespacedType, action, local);
   });
@@ -791,7 +799,7 @@ function getModuleByNamespace (store, helper, namespace) {
 var index_esm = {
   Store: Store,
   install: install,
-  version: '2.3.0',
+  version: '2.3.1',
   mapState: mapState,
   mapMutations: mapMutations,
   mapGetters: mapGetters,
